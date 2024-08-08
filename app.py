@@ -33,6 +33,18 @@ def register():
     db.commit()
     return jsonify({'message': 'User registered successfully!'})
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM user WHERE email = ?', (data['email'],))
+    user = cursor.fetchone()
+    if user and check_password_hash(user[3], data['password']):
+        access_token = create_access_token(identity={'username': user[1], 'email': user[2]})
+        return jsonify(access_token=access_token)
+    return jsonify({'message': 'Invalid credentials'}), 401
+
 @app.route('/')
 def home():
     return "Welcome to the Expense Tracker!"
