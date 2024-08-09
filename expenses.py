@@ -42,3 +42,38 @@ def get_expenses():
             'user_id': expense[5]
         })
     return jsonify(expense_list)
+
+# update expense
+@expenses.route('/expenses/<int:id>', methods=['PUT'])
+@jwt_required()
+def update_expense(id):
+    data = request.get_json()
+    current_user = get_jwt_identity()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT id FROM user WHERE email = ?', (current_user['email'],))
+    user_id = cursor.fetchone()[0]
+    cursor.execute('SELECT * FROM expense WHERE id = ? AND user_id = ?', (id, user_id))
+    expense = cursor.fetchone()
+    if not expense:
+        return jsonify({'message': 'Expense not found'}), 404
+    cursor.execute('UPDATE expense SET amount = ?, description = ?, category_id = ? WHERE id = ? ', (data['amount'], data['description'], data['category_id'], id))
+    db.commit()
+    return jsonify({'message': 'Expense updated successfully'})
+
+# delete expense
+@expenses.route('/expenses/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_expense(id):
+    current_user = get_jwt_identity()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT id FROM user WHERE email = ?', (current_user['email'],))
+    user_id = cursor.fetchone()[0]
+    cursor.execute('SELECT * FROM expense WHERE id = ? AND user_id = ?', (id, user_id))
+    expense = cursor.fetchone()
+    if not expense:
+        return jsonify({'message': 'Expense not found'}), 404
+    cursor.execute('DELETE FROM expense WHERE id = ?', (id,))
+    db.commit()
+    return jsonify({'message': 'Expense deleted successfully!'})
