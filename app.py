@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 
 from auth import auth as auth_blueprint
+from categories import categories as categories_blueprint
 from database import close_connection, get_db
 from expenses import expenses as expenses_blueprint
 
@@ -14,6 +15,7 @@ app.teardown_appcontext(close_connection)
 # Register blueprints
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(expenses_blueprint)
+app.register_blueprint(categories_blueprint)
 
 @app.route('/')
 def home():
