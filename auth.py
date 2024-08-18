@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token
+from flask import Blueprint, jsonify, make_response, request
+from flask_jwt_extended import create_access_token, jwt_required
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database import get_db
@@ -24,7 +24,16 @@ def login():
     cursor = db.cursor()
     cursor.execute('SELECT * FROM user WHERE email = ?', (data['email'],))
     user = cursor.fetchone()
+    
     if user and check_password_hash(user[3], data['password']):
         access_token = create_access_token(identity={'username': user[1], 'email': user[2]})
-        return jsonify(access_token=access_token)
+        response = make_response(jsonify({'message': 'Login successfull', 'user': {'username': user[1], 'email': user[2]}}))
+        response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='Lax')
+        return response
     return jsonify({'message': 'Invalid credentials'}), 401
+
+@auth.route('/logout', methods=['POST'])
+def logout():
+    response = make_response(jsonify({'message': 'Logout successful'}))
+    response.set_cookie('access_token', '', expires=0, httponly=True, secure=True, samesite='Lax')
+    return response
