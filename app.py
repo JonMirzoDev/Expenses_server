@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -7,6 +7,7 @@ from categories import categories as categories_blueprint
 from dashboard import dashboard as dashboard_blueprint
 from database import close_connection, get_db
 from expenses import expenses as expenses_blueprint
+import logging
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
@@ -21,6 +22,12 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(expenses_blueprint)
 app.register_blueprint(categories_blueprint)
 app.register_blueprint(dashboard_blueprint)
+
+@app.before_request
+def log_request_info():
+    logging.info(f"Headers: {request.headers}")
+    logging.info(f"Cookies: {request.cookies}")
+    logging.info(f"CSRF Token Header: {request.headers.get('X-CSRF-Token')}")
 
 @app.route('/')
 def home():

@@ -45,11 +45,25 @@ def login():
 @auth.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh_token():
-    identity = get_jwt_identity()
-    new_access_token = create_access_token(identity=identity)
-    response = make_response(jsonify({'access_token': new_access_token}))
-    set_access_cookies(response, new_access_token)
-    return response
+    try:
+        csrf_token = request.headers.get('X-CSRF-Token')
+        print(f"CSRF Token received: {csrf_token}")  # Debugging line
+
+        identity = get_jwt_identity()
+        print(f"Identity from refresh token: {identity}")  # Debugging line
+
+        if not identity:
+            print("No identity found in the refresh token.")  # Debugging line
+            return jsonify({"msg": "Invalid refresh token"}), 401
+
+        new_access_token = create_access_token(identity=identity)
+        response = make_response(jsonify({'access_token': new_access_token}))
+        set_access_cookies(response, new_access_token)
+        return response
+    except Exception as e:
+        print(f"Error in refresh token handling: {str(e)}")  # Debugging line
+        return jsonify({"msg": "Token refresh failed"}), 401
+
 
 @auth.route('/logout', methods=['POST'])
 def logout():
