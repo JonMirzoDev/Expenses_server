@@ -1,3 +1,6 @@
+import logging
+from datetime import timedelta
+
 from flask import Flask, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -7,12 +10,12 @@ from categories import categories as categories_blueprint
 from dashboard import dashboard as dashboard_blueprint
 from database import close_connection, get_db
 from expenses import expenses as expenses_blueprint
-import logging
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
 app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 jwt = JWTManager(app)
 
 app.teardown_appcontext(close_connection)

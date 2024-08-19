@@ -25,12 +25,26 @@ def add_expense():
 @jwt_required()
 def get_expenses():
     current_user = get_jwt_identity()
+    category_id = request.args.get('category_id')
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT id FROM user WHERE email = ?', (current_user['email'],))
     user_id = cursor.fetchone()[0]
-    cursor.execute('SELECT * FROM expense WHERE user_id = ?', (user_id,))
+
+    # Query to fetch expenses, with optional filtering by category_id
+    if category_id:
+        cursor.execute(
+            'SELECT * FROM expense WHERE user_id = ? AND category_id = ? ORDER BY id DESC',
+            (user_id, category_id)
+        )
+    else:
+        cursor.execute(
+            'SELECT * FROM expense WHERE user_id = ? ORDER BY id DESC',
+            (user_id,)
+        )
+    
     expenses = cursor.fetchall()
+
     expense_list = []
     for expense in expenses:
         expense_list.append({
@@ -41,6 +55,7 @@ def get_expenses():
             'category_id': expense[4],
             'user_id': expense[5]
         })
+        
     return jsonify(expense_list)
 
 # update expense
