@@ -1,8 +1,10 @@
+import os
 import sqlite3
 
+DATABASE = os.getenv('DATABASE_URL', 'sqlite:///expenses.db').split(':///')[-1]  # Get database path
 
 def init_db():
-    db = sqlite3.connect('expenses.db')
+    db = sqlite3.connect(DATABASE)
     cursor = db.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user (
@@ -32,6 +34,6 @@ def init_db():
     ''')
     db.commit()
     db.close()
-    
+
 if __name__ == '__main__':
     init_db()
