@@ -1,6 +1,7 @@
+import os
 import sqlite3
 
-DATABASE = 'expenses.db'
+DATABASE = os.path.join(os.getcwd(), 'expenses.db')
 
 def init_db():
     db = sqlite3.connect(DATABASE)
