@@ -1,7 +1,6 @@
-import os
 import sqlite3
 
-DATABASE = os.getenv('DATABASE_URL', 'sqlite:///expenses.db').split(':///')[-1]  # Get database path
+DATABASE = 'expenses.db'
 
 def init_db():
     db = sqlite3.connect(DATABASE)

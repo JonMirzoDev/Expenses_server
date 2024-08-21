@@ -1,9 +1,8 @@
-import os
 import sqlite3
 
 from flask import g
 
-DATABASE = os.getenv('DATABASE_URL', 'sqlite:///expenses.db')  # Get DATABASE_URL from environment
+DATABASE = 'expenses.db'
 
 def get_db():
     db = getattr(g, '_database', None)
