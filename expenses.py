@@ -20,30 +20,43 @@ def add_expense():
     db.commit()
     return jsonify({'message': 'Expense added successfully!'})
 
-# get all expenses
+# get all expenses with pagination
 @expenses.route('/expenses', methods=['GET'])
 @jwt_required()
 def get_expenses():
     current_user = get_jwt_identity()
     category_id = request.args.get('category_id')
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 10))
+    offset = (page - 1) * per_page
+
     db = get_db()
     cursor = db.cursor()
     cursor.execute('SELECT id FROM user WHERE email = ?', (current_user['email'],))
     user_id = cursor.fetchone()[0]
 
-    # Query to fetch expenses, with optional filtering by category_id
+    # Query to fetch expenses with optional filtering by category_id and pagination
     if category_id:
         cursor.execute(
-            'SELECT * FROM expense WHERE user_id = ? AND category_id = ? ORDER BY id DESC',
+            'SELECT * FROM expense WHERE user_id = ? AND category_id = ? ORDER BY id DESC LIMIT ? OFFSET ?',
+            (user_id, category_id, per_page, offset)
+        )
+        total_cursor = db.execute(
+            'SELECT COUNT(*) FROM expense WHERE user_id = ? AND category_id = ?',
             (user_id, category_id)
         )
     else:
         cursor.execute(
-            'SELECT * FROM expense WHERE user_id = ? ORDER BY id DESC',
+            'SELECT * FROM expense WHERE user_id = ? ORDER BY id DESC LIMIT ? OFFSET ?',
+            (user_id, per_page, offset)
+        )
+        total_cursor = db.execute(
+            'SELECT COUNT(*) FROM expense WHERE user_id = ?',
             (user_id,)
         )
-    
+
     expenses = cursor.fetchall()
+    total_expenses = total_cursor.fetchone()[0]
 
     expense_list = []
     for expense in expenses:
@@ -55,8 +68,14 @@ def get_expenses():
             'category_id': expense[4],
             'user_id': expense[5]
         })
-        
-    return jsonify(expense_list)
+
+    return jsonify({
+        'expenses': expense_list,
+        'total': total_expenses,
+        'page': page,
+        'per_page': per_page
+    })
+
 
 # update expense
 @expenses.route('/expenses/<int:id>', methods=['PUT'])

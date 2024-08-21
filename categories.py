@@ -22,10 +22,29 @@ def add_category():
 def get_categories():
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM category')
+
+    # Get pagination parameters
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 10))
+    offset = (page - 1) * per_page
+
+    # Query to fetch total count of categories
+    cursor.execute('SELECT COUNT(*) FROM category')
+    total_categories = cursor.fetchone()[0]
+
+    # Query to fetch categories with pagination
+    cursor.execute(
+        'SELECT * FROM category ORDER BY id DESC LIMIT ? OFFSET ?',
+        (per_page, offset)
+    )
     categories = cursor.fetchall()
+
     category_list = [{'id': category[0], 'name': category[1]} for category in categories]
-    return jsonify(category_list)
+
+    return jsonify({
+        'categories': category_list,
+        'total': total_categories
+    })
 
 @categories.route('/categories/<int:id>', methods=['PUT'])
 @jwt_required()
