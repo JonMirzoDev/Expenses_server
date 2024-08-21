@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import timedelta
+from init_db import init_db
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -42,5 +43,9 @@ def home():
     return "Welcome to the Expense Tracker!"
 
 if __name__ == '__main__':
+    if not os.path.exists('expenses.db'):
+        print("Database not found. Initializing...")
+        init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
