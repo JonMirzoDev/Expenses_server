@@ -36,10 +36,13 @@ def login():
             'message': 'Login successful', 
             'user': {'username': user[1], 'email': user[2]}
         }))
-        set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
+        
+        # Setting cookies with HttpOnly, SameSite=None, and Secure attributes
+        set_access_cookies(response, access_token, max_age=36000, samesite='None', secure=True)
+        set_refresh_cookies(response, refresh_token, max_age=6048000, samesite='None', secure=True)
         
         return response
+    
     return jsonify({'message': 'Invalid credentials'}), 401
 
 @auth.route('/refresh', methods=['POST'])
