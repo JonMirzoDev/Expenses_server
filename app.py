@@ -22,6 +22,12 @@ CORS(app, supports_credentials=True, origins=['http://localhost:3000'])
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
+app.config['JWT_COOKIE_SECURE'] = True
+app.config['JWT_COOKIE_SAMESITE'] = 'None'
+app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+app.config['JWT_REFRESH_COOKIE_PATH'] = '/token/refresh'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=10)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7) 
 jwt = JWTManager(app)
 
 app.teardown_appcontext(close_connection)
