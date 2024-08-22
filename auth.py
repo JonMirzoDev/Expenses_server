@@ -32,12 +32,12 @@ def login():
         access_token = create_access_token(identity={'username': user[1], 'email': user[2]})
         refresh_token = create_refresh_token(identity={'username': user[1], 'email': user[2]})
         
-        response = make_response(jsonify({'message': 'Login successful', 'user': {'username': user[1], 'email': user[2]}}))
+        response = make_response(jsonify({
+            'message': 'Login successful', 
+            'user': {'username': user[1], 'email': user[2]}
+        }))
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
-        
-        response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='None')
-        response.set_cookie('refresh_token', refresh_token, httponly=True, secure=True, samesite='None')
         
         return response
     return jsonify({'message': 'Invalid credentials'}), 401
