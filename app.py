@@ -1,7 +1,6 @@
 import logging
 import os
 from datetime import timedelta
-from init_db import init_db
 
 from dotenv import load_dotenv
 from flask import Flask, request
@@ -13,6 +12,10 @@ from categories import categories as categories_blueprint
 from dashboard import dashboard as dashboard_blueprint
 from database import close_connection, get_db
 from expenses import expenses as expenses_blueprint
+from init_db import init_db
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 load_dotenv()
 
