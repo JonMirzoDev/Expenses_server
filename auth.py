@@ -34,7 +34,7 @@ def login():
             'user': {'username': user[1], 'email': user[2]}
         }))
         
-        response.set_cookie('access_token', access_token, httponly=True, secure=True, samesite='None')
+        response.set_cookie('access_token_cookie', access_token, httponly=True, secure=True, samesite='None')
         
         return response
     
