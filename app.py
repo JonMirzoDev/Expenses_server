@@ -28,6 +28,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 app.config['JWT_COOKIE_SECURE'] = True
 app.config['JWT_COOKIE_SAMESITE'] = 'None'
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False 
 jwt = JWTManager(app)
 
 app.teardown_appcontext(close_connection)
