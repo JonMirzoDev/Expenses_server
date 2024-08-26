@@ -28,9 +28,6 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 app.config['JWT_COOKIE_SECURE'] = True
 app.config['JWT_COOKIE_SAMESITE'] = 'None'
 app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
-app.config['JWT_REFRESH_COOKIE_PATH'] = '/token/refresh'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=10)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7) 
 jwt = JWTManager(app)
 
 app.teardown_appcontext(close_connection)
@@ -40,11 +37,6 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(expenses_blueprint)
 app.register_blueprint(categories_blueprint)
 app.register_blueprint(dashboard_blueprint)
-
-@app.before_request
-def log_request_info():
-    logging.info(f"CSRF Token Header: {request.headers.get('X-CSRF-Token')}")
-    logging.info(f"CSRF Token Cookie: {request.cookies.get('csrf_access_token')}")
 
 @app.route('/')
 def home():
@@ -56,4 +48,3 @@ if __name__ == '__main__':
         init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-
