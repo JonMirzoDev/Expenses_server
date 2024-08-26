@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=['http://localhost:3000', 'https://cs50-expense-tracker-073870393662.herokuapp.com'])
+CORS(app, supports_credentials=True, origins=['http://localhost:3000', 'https://expenses-client-one.vercel.app'])
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
